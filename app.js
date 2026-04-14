@@ -77,16 +77,25 @@ function handlePaste(event) {
 
 function handleKeyDown(event) {
     const isUndoShortcut = (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z';
+    const isCopyShortcut = (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'c';
     const target = event.target;
     const isEditableTarget = target instanceof HTMLElement
         && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName));
 
-    if (!isUndoShortcut || isEditableTarget || state.history.length === 0) {
+    if (isEditableTarget) {
         return;
     }
 
-    event.preventDefault();
-    handleUndoClick();
+    if (isUndoShortcut && state.history.length > 0) {
+        event.preventDefault();
+        handleUndoClick();
+        return;
+    }
+
+    if (isCopyShortcut && state.imageLoaded) {
+        event.preventDefault();
+        handleCopyClick();
+    }
 }
 
 function handleMouseDown(event) {
