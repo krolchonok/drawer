@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+    <title>Blur / Pixelate область на изображении</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<main class="container">
+    <h1>Выделение области и blur / пикселизация</h1>
+
+    <section class="controls" aria-label="Панель управления">
+        <div class="control-block">
+            <label for="fileInput">Загрузите изображение:</label>
+            <input type="file" id="fileInput" accept="image/*">
+            <span class="control-hint">Или вставьте картинку из буфера через Ctrl+V.</span>
+        </div>
+
+        <div class="control-block">
+            <span>Режим обработки:</span>
+            <label>
+                <input type="radio" name="mode" value="blur" checked>
+                Blur (размытие)
+            </label>
+            <label>
+                <input type="radio" name="mode" value="pixelate">
+                Пикселизация
+            </label>
+        </div>
+
+        <div class="control-block">
+            <label for="intensity">Интенсивность (1-25):</label>
+            <input type="range" id="intensity" min="1" max="25" value="8">
+        </div>
+
+        <div class="control-block control-block-actions">
+            <span>Действия:</span>
+            <div class="actions">
+                <button id="applyBtn" disabled>Применить к выделенным областям</button>
+                <button id="undoBtn" disabled>Отменить закрашивание</button>
+                <button id="clearBtn" disabled>Очистить выделения</button>
+                <button id="copyBtn" disabled>Копировать в буфер</button>
+                <button id="downloadBtn" disabled>Скачать результат</button>
+            </div>
+        </div>
+    </section>
+
+    <div id="canvasWrapper" aria-label="Область редактирования изображения">
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <p id="status" class="status" aria-live="polite"></p>
+
+    <p class="note">
+        1. Загрузите изображение или вставьте его из буфера обмена.<br>
+        2. ЛКМ потяните по картинке, чтобы выделить область. Можно делать несколько выделений подряд.<br>
+        3. Нажмите «Применить к выделенным областям», чтобы обработать выбранные части изображения.<br>
+        4. «Отменить закрашивание» возвращает предыдущее применённое состояние изображения.<br>
+        5. «Копировать в буфер» копирует текущий результат как PNG, «Скачать результат» сохраняет файл.
+    </p>
+</main>
+
+<script src="./app.js"></script>
+</body>
+</html>
