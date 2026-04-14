@@ -198,11 +198,6 @@ async function handleCopyClick() {
         return;
     }
 
-    if (!navigator.clipboard || typeof window.ClipboardItem === 'undefined') {
-        setStatus('Буфер обмена не поддерживается этим браузером.', true);
-        return;
-    }
-
     redrawBaseImageToCanvas();
 
     const blob = await canvasToBlob(elements.canvas);
@@ -213,14 +208,10 @@ async function handleCopyClick() {
     }
 
     try {
-        await navigator.clipboard.write([
-            new ClipboardItem({
-                'image/png': blob
-            })
-        ]);
+        await writeImageToClipboard(blob);
         setStatus('Изображение скопировано в буфер обмена.');
     } catch (error) {
-        setStatus('Не удалось записать изображение в буфер обмена.', true);
+        setStatus(getClipboardErrorMessage(), true);
     } finally {
         render();
     }
@@ -457,4 +448,95 @@ function canvasToBlob(canvas) {
 
 function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
+}
+
+async function writeImageToClipboard(blob) {
+    if (canUseAsyncClipboardForImages()) {
+        await navigator.clipboard.write([
+            new ClipboardItem({
+                [blob.type]: blob
+            })
+        ]);
+        return;
+    }
+
+    const dataUrl = await blobToDataUrl(blob);
+    const copied = copyImageWithExecCommand(dataUrl);
+
+    if (!copied) {
+        throw new Error('Clipboard image write is not supported.');
+    }
+}
+
+function canUseAsyncClipboardForImages() {
+    return Boolean(
+        window.isSecureContext
+        && navigator.clipboard
+        && typeof navigator.clipboard.write === 'function'
+        && typeof window.ClipboardItem !== 'undefined'
+    );
+}
+
+function copyImageWithExecCommand(dataUrl) {
+    const selection = window.getSelection();
+    if (!selection || typeof document.execCommand !== 'function') {
+        return false;
+    }
+
+    const container = document.createElement('div');
+    container.contentEditable = 'true';
+    container.setAttribute('aria-hidden', 'true');
+    container.style.position = 'fixed';
+    container.style.top = '0';
+    container.style.left = '-9999px';
+    container.style.width = '1px';
+    container.style.height = '1px';
+    container.style.overflow = 'hidden';
+
+    const image = document.createElement('img');
+    image.src = dataUrl;
+    image.alt = '';
+    container.appendChild(image);
+    document.body.appendChild(container);
+
+    const range = document.createRange();
+    range.selectNode(container);
+    selection.removeAllRanges();
+    selection.addRange(range);
+
+    let copied = false;
+
+    try {
+        copied = document.execCommand('copy');
+    } finally {
+        selection.removeAllRanges();
+        document.body.removeChild(container);
+    }
+
+    return copied;
+}
+
+function blobToDataUrl(blob) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error('Failed to convert blob to data URL.'));
+        reader.readAsDataURL(blob);
+    });
+}
+
+function getClipboardErrorMessage() {
+    if (isFirefox()) {
+        return 'Firefox ограничивает запись изображений в буфер обмена для веб-страниц. Если копирование не сработало, используйте скачивание.';
+    }
+
+    if (!window.isSecureContext) {
+        return 'Буфер обмена для изображений работает только в secure context: HTTPS или localhost.';
+    }
+
+    return 'Не удалось записать изображение в буфер обмена.';
+}
+
+function isFirefox() {
+    return navigator.userAgent.includes('Firefox');
 }
