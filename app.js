@@ -44,6 +44,7 @@ class DrawerApp {
 
     init() {
         this.bindEvents();
+        this.handleModeChange();
         this.render();
     }
 
@@ -90,6 +91,11 @@ class DrawerApp {
         // Slider intensity change
         this.elements.intensity.addEventListener('input', (e) => {
             this.elements.intensityVal.textContent = e.target.value;
+        });
+
+        // Mode change handler
+        document.querySelectorAll('input[name="mode"]').forEach((radio) => {
+            radio.addEventListener('change', () => this.handleModeChange());
         });
 
         // Global keys and paste handlers
@@ -193,6 +199,41 @@ class DrawerApp {
         }
     }
 
+    handleModeChange() {
+        const modeEl = document.querySelector('input[name="mode"]:checked');
+        const mode = modeEl ? modeEl.value : 'blur';
+
+        // Show/hide Intensity Block
+        const intensityBlock = document.getElementById('intensityBlock');
+        if (intensityBlock) {
+            intensityBlock.style.display = (mode === 'blur' || mode === 'pixelate') ? 'block' : 'none';
+        }
+
+        // Show/hide Glue options Block
+        const glueBlock = document.getElementById('glueBlock');
+        if (glueBlock) {
+            glueBlock.style.display = (mode === 'glue') ? 'block' : 'none';
+        }
+
+        // Update apply button text
+        if (mode === 'crop') {
+            this.elements.applyBtn.textContent = 'Кадрировать';
+        } else if (mode === 'glue') {
+            this.elements.applyBtn.textContent = 'Склеить области';
+        } else {
+            this.elements.applyBtn.textContent = 'Применить эффект';
+        }
+
+        // Adjust selections based on new mode requirements
+        if (mode === 'crop' && this.state.selectionRects.length > 1) {
+            this.state.selectionRects = [this.state.selectionRects[this.state.selectionRects.length - 1]];
+        } else if (mode === 'glue' && this.state.selectionRects.length > 2) {
+            this.state.selectionRects = this.state.selectionRects.slice(-2);
+        }
+
+        this.render();
+    }
+
     // --- Selection Mouse Handlers ---
 
     handleMouseDown(event) {
@@ -237,7 +278,18 @@ class DrawerApp {
         );
 
         if (rect.w >= this.MIN_SELECTION_SIZE && rect.h >= this.MIN_SELECTION_SIZE) {
-            this.state.selectionRects.push(rect);
+            const modeEl = document.querySelector('input[name="mode"]:checked');
+            const mode = modeEl ? modeEl.value : 'blur';
+            if (mode === 'crop') {
+                this.state.selectionRects = [rect];
+            } else if (mode === 'glue') {
+                if (this.state.selectionRects.length >= 2) {
+                    this.state.selectionRects.shift();
+                }
+                this.state.selectionRects.push(rect);
+            } else {
+                this.state.selectionRects.push(rect);
+            }
         }
 
         this.render();
@@ -246,24 +298,44 @@ class DrawerApp {
     // --- Action Implementations ---
 
     handleApplyClick() {
-        if (!this.state.imageLoaded || this.state.selectionRects.length === 0) {
+        if (!this.state.imageLoaded) {
             return;
         }
 
-        this.saveHistorySnapshot();
-        this.redrawBaseImageToCanvas();
+        const modeEl = document.querySelector('input[name="mode"]:checked');
+        const mode = modeEl ? modeEl.value : 'blur';
 
-        const mode = document.querySelector('input[name="mode"]:checked').value;
-        const intensity = Number.parseInt(this.elements.intensity.value, 10) || 8;
+        if (mode === 'crop') {
+            if (this.state.selectionRects.length === 0) {
+                this.setStatus('Пожалуйста, выделите область для кадрирования.', true);
+                return;
+            }
+            this.applyCrop(this.state.selectionRects[0]);
+        } else if (mode === 'glue') {
+            if (this.state.selectionRects.length !== 2) {
+                this.setStatus('Для склеивания необходимо выделить ровно две области.', true);
+                return;
+            }
+            this.applyGlue(this.state.selectionRects[0], this.state.selectionRects[1]);
+        } else {
+            if (this.state.selectionRects.length === 0) {
+                return;
+            }
 
-        for (const rect of this.state.selectionRects) {
-            this.applyEffect(rect, mode, intensity);
+            this.saveHistorySnapshot();
+            this.redrawBaseImageToCanvas();
+
+            const intensity = Number.parseInt(this.elements.intensity.value, 10) || 8;
+
+            for (const rect of this.state.selectionRects) {
+                this.applyEffect(rect, mode, intensity);
+            }
+
+            this.commitCanvasToBase();
+            this.state.selectionRects = [];
+            this.render();
+            this.setStatus('Эффекты применены к выделенным областям.');
         }
-
-        this.commitCanvasToBase();
-        this.state.selectionRects = [];
-        this.render();
-        this.setStatus('Эффекты применены к выделенным областям.');
     }
 
     handleUndoClick() {
@@ -346,6 +418,129 @@ class DrawerApp {
         this.setStatus('Файл успешно сохранен.');
     }
 
+    applyCrop(rect) {
+        this.saveHistorySnapshot();
+
+        // Create temporary canvas to hold the cropped image data
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = rect.w;
+        tempCanvas.height = rect.h;
+        const tempCtx = tempCanvas.getContext('2d');
+
+        // Draw cropped area from baseCanvas
+        tempCtx.drawImage(
+            this.baseCanvas,
+            rect.x,
+            rect.y,
+            rect.w,
+            rect.h,
+            0,
+            0,
+            rect.w,
+            rect.h
+        );
+
+        // Resize baseCanvas and main canvas
+        this.baseCanvas.width = rect.w;
+        this.baseCanvas.height = rect.h;
+        this.elements.canvas.width = rect.w;
+        this.elements.canvas.height = rect.h;
+
+        // Draw cropped image back
+        this.baseCtx.drawImage(tempCanvas, 0, 0);
+        this.ctx.drawImage(tempCanvas, 0, 0);
+
+        this.state.selectionRects = [];
+        this.render();
+        this.setStatus('Изображение успешно кадрировано.');
+    }
+
+    applyGlue(r1, r2) {
+        this.saveHistorySnapshot();
+
+        const direction = this.getGlueDirection(r1, r2);
+        let newWidth, newHeight;
+        let drawCoords1, drawCoords2;
+
+        if (direction === 'vertical') {
+            // Sort by Y-coordinate
+            const [first, second] = r1.y <= r2.y ? [r1, r2] : [r2, r1];
+            newWidth = Math.max(first.w, second.w);
+            newHeight = first.h + second.h;
+
+            drawCoords1 = { sx: first.x, sy: first.y, sw: first.w, sh: first.h, dx: 0, dy: 0, dw: first.w, dh: first.h };
+            drawCoords2 = { sx: second.x, sy: second.y, sw: second.w, sh: second.h, dx: 0, dy: first.h, dw: second.w, dh: second.h };
+        } else {
+            // Sort by X-coordinate
+            const [first, second] = r1.x <= r2.x ? [r1, r2] : [r2, r1];
+            newWidth = first.w + second.w;
+            newHeight = Math.max(first.h, second.h);
+
+            drawCoords1 = { sx: first.x, sy: first.y, sw: first.w, sh: first.h, dx: 0, dy: 0, dw: first.w, dh: first.h };
+            drawCoords2 = { sx: second.x, sy: second.y, sw: second.w, sh: second.h, dx: first.w, dy: 0, dw: second.w, dh: second.h };
+        }
+
+        // Create temporary canvas to hold the glued image data
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = newWidth;
+        tempCanvas.height = newHeight;
+        const tempCtx = tempCanvas.getContext('2d');
+
+        // Draw first area
+        tempCtx.drawImage(
+            this.baseCanvas,
+            drawCoords1.sx, drawCoords1.sy, drawCoords1.sw, drawCoords1.sh,
+            drawCoords1.dx, drawCoords1.dy, drawCoords1.dw, drawCoords1.dh
+        );
+
+        // Draw second area
+        tempCtx.drawImage(
+            this.baseCanvas,
+            drawCoords2.sx, drawCoords2.sy, drawCoords2.sw, drawCoords2.sh,
+            drawCoords2.dx, drawCoords2.dy, drawCoords2.dw, drawCoords2.dh
+        );
+
+        // Resize baseCanvas and main canvas
+        this.baseCanvas.width = newWidth;
+        this.baseCanvas.height = newHeight;
+        this.elements.canvas.width = newWidth;
+        this.elements.canvas.height = newHeight;
+
+        // Draw glued image back
+        this.baseCtx.drawImage(tempCanvas, 0, 0);
+        this.ctx.drawImage(tempCanvas, 0, 0);
+
+        this.state.selectionRects = [];
+        this.render();
+        this.setStatus(`Области успешно склеены (${direction === 'vertical' ? 'вертикально' : 'горизонтально'}).`);
+    }
+
+    getGlueDirection(r1, r2) {
+        const directionMode = document.querySelector('input[name="glueDirection"]:checked')?.value || 'auto';
+        if (directionMode !== 'auto') {
+            return directionMode;
+        }
+
+        // Auto-detect based on overlap and center distances
+        const xOverlap = Math.max(0, Math.min(r1.x + r1.w, r2.x + r2.w) - Math.max(r1.x, r2.x));
+        const yOverlap = Math.max(0, Math.min(r1.y + r1.h, r2.y + r2.h) - Math.max(r1.y, r2.y));
+
+        if (xOverlap > 0 && yOverlap === 0) {
+            return 'vertical';
+        }
+        if (yOverlap > 0 && xOverlap === 0) {
+            return 'horizontal';
+        }
+
+        // Fallback to center distances
+        const cx1 = r1.x + r1.w / 2;
+        const cy1 = r1.y + r1.h / 2;
+        const cx2 = r2.x + r2.w / 2;
+        const cy2 = r2.y + r2.h / 2;
+
+        return Math.abs(cy1 - cy2) >= Math.abs(cx1 - cx2) ? 'vertical' : 'horizontal';
+    }
+
     // --- Effect Calculations ---
 
     applyEffect(rect, mode, intensity) {
@@ -423,19 +618,26 @@ class DrawerApp {
     render() {
         this.redrawBaseImageToCanvas();
 
-        for (const rect of this.state.selectionRects) {
-            this.drawSelectionRect(rect);
-        }
+        const modeEl = document.querySelector('input[name="mode"]:checked');
+        const mode = modeEl ? modeEl.value : 'blur';
+
+        this.state.selectionRects.forEach((rect, index) => {
+            this.drawSelectionRect(rect, mode === 'glue' ? index + 1 : null);
+        });
 
         if (this.state.imageLoaded && this.state.isDragging) {
-            this.drawSelectionRect(
-                this.getNormalizedRect(
-                    this.state.dragStartX,
-                    this.state.dragStartY,
-                    this.state.dragCurrentX,
-                    this.state.dragCurrentY
-                )
+            const currentTempRect = this.getNormalizedRect(
+                this.state.dragStartX,
+                this.state.dragStartY,
+                this.state.dragCurrentX,
+                this.state.dragCurrentY
             );
+
+            let tempIndex = null;
+            if (mode === 'glue') {
+                tempIndex = this.state.selectionRects.length < 2 ? this.state.selectionRects.length + 1 : 2;
+            }
+            this.drawSelectionRect(currentTempRect, tempIndex);
         }
 
         this.updateControls();
@@ -454,21 +656,49 @@ class DrawerApp {
         const hasSelection = this.state.selectionRects.length > 0;
         const hasHistory = this.state.history.length > 0;
 
-        this.elements.applyBtn.disabled = !hasImage || !hasSelection;
+        let canApply = false;
+        if (hasImage) {
+            const modeEl = document.querySelector('input[name="mode"]:checked');
+            const mode = modeEl ? modeEl.value : 'blur';
+            if (mode === 'crop') {
+                canApply = this.state.selectionRects.length === 1;
+            } else if (mode === 'glue') {
+                canApply = this.state.selectionRects.length === 2;
+            } else {
+                canApply = hasSelection;
+            }
+        }
+
+        this.elements.applyBtn.disabled = !canApply;
         this.elements.undoBtn.disabled = !hasImage || !hasHistory;
         this.elements.clearBtn.disabled = !hasImage || !hasSelection;
         this.elements.copyBtn.disabled = !hasImage;
         this.elements.downloadBtn.disabled = !hasImage;
     }
 
-    drawSelectionRect(rect) {
+    drawSelectionRect(rect, label = null) {
         this.ctx.save();
-        this.ctx.fillStyle = 'rgba(59, 130, 246, 0.2)';
+
+        const isGlue = label !== null;
+        this.ctx.fillStyle = isGlue ? 'rgba(249, 115, 22, 0.15)' : 'rgba(59, 130, 246, 0.2)';
         this.ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+
         this.ctx.lineWidth = 1.5;
-        this.ctx.strokeStyle = '#3b82f6';
+        this.ctx.strokeStyle = isGlue ? '#f97316' : '#3b82f6';
         this.ctx.setLineDash([6, 4]);
         this.ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
+
+        if (label !== null) {
+            this.ctx.fillStyle = '#f97316';
+            this.ctx.fillRect(rect.x, rect.y, 16, 16);
+
+            this.ctx.fillStyle = '#ffffff';
+            this.ctx.font = 'bold 10px Tahoma, Arial, sans-serif';
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'middle';
+            this.ctx.fillText(label.toString(), rect.x + 8, rect.y + 8);
+        }
+
         this.ctx.restore();
     }
 

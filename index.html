@@ -49,15 +49,42 @@
                         <input type="radio" name="mode" value="pixelate" id="modePixelate">
                         <label for="modePixelate" class="mode-label">Пикселизация</label>
                     </div>
+                    <div class="mode-option">
+                        <input type="radio" name="mode" value="crop" id="modeCrop">
+                        <label for="modeCrop" class="mode-label">Кадрирование (Crop)</label>
+                    </div>
+                    <div class="mode-option">
+                        <input type="radio" name="mode" value="glue" id="modeGlue">
+                        <label for="modeGlue" class="mode-label">Склеить 2 области</label>
+                    </div>
                 </div>
             </div>
 
             <!-- Интенсивность -->
-            <div class="control-block">
+            <div class="control-block" id="intensityBlock">
                 <label class="group-title" for="intensity">Интенсивность</label>
                 <div class="range-container">
                     <input type="range" id="intensity" min="1" max="25" value="8">
                     <span class="range-val" id="intensityVal">8</span>
+                </div>
+            </div>
+
+            <!-- Настройки склеивания -->
+            <div class="control-block" id="glueBlock" style="display: none;">
+                <label class="group-title">Настройки склеивания</label>
+                <div class="mode-group">
+                    <div class="mode-option">
+                        <input type="radio" name="glueDirection" value="auto" id="glueAuto" checked>
+                        <label for="glueAuto" class="mode-label">Авто-определение</label>
+                    </div>
+                    <div class="mode-option">
+                        <input type="radio" name="glueDirection" value="vertical" id="glueVertical">
+                        <label for="glueVertical" class="mode-label">По вертикали</label>
+                    </div>
+                    <div class="mode-option">
+                        <input type="radio" name="glueDirection" value="horizontal" id="glueHorizontal">
+                        <label for="glueHorizontal" class="mode-label">По горизонтали</label>
+                    </div>
                 </div>
             </div>
 
@@ -93,8 +120,9 @@
             <h3>Краткая справка</h3>
             <ol>
                 <li>Вставьте картинку через Ctrl+V, перетащите файл или воспользуйтесь кнопкой выбора.</li>
-                <li>Зажмите левую кнопку мыши и выделите прямоугольник на изображении.</li>
-                <li>Нажмите «Применить эффект».</li>
+                <li>Выберите нужный режим обработки (Размытие, Пикселизация, Кадрирование или Склеивание).</li>
+                <li>Зажмите левую кнопку мыши и выделите область на изображении (для склеивания выделите две области).</li>
+                <li>Нажмите кнопку действия («Применить эффект» / «Кадрировать» / «Склеить области»).</li>
                 <li>Сохраните результат через копирование или скачивание.</li>
             </ol>
         </section>
