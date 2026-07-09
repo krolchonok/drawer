@@ -77,9 +77,8 @@ class DrawerApp {
 
         // Canvas mouse events
         this.elements.canvas.addEventListener('mousedown', (e) => this.handleMouseDown(e));
-        this.elements.canvas.addEventListener('mousemove', (e) => this.handleMouseMove(e));
-        this.elements.canvas.addEventListener('mouseup', () => this.finalizeSelection());
-        this.elements.canvas.addEventListener('mouseleave', () => this.finalizeSelection());
+        window.addEventListener('mousemove', (e) => this.handleMouseMove(e));
+        window.addEventListener('mouseup', () => this.finalizeSelection());
 
         // Control action buttons
         this.elements.applyBtn.addEventListener('click', () => this.handleApplyClick());
@@ -200,6 +199,8 @@ class DrawerApp {
         if (!this.state.imageLoaded) {
             return;
         }
+        
+        event.preventDefault();
 
         const point = this.getCanvasPoint(event);
         this.state.isDragging = true;
