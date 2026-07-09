@@ -4,62 +4,90 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="./favicon.svg" type="image/svg+xml">
-    <title>Blur / Pixelate область на изображении</title>
+    <title>Blur & Pixelate Utility</title>
     <link rel="stylesheet" href="./style.css">
 </head>
 <body>
 <main class="container">
-    <h1>Выделение области и blur / пикселизация</h1>
+    <header>
+        <h1>Blur & Pixelate Utility</h1>
+        <p class="subtitle">Скрытие конфиденциальной информации на изображениях</p>
+    </header>
 
     <section class="controls" aria-label="Панель управления">
+        <!-- Загрузка изображения -->
         <div class="control-block">
-            <label for="fileInput">Загрузите изображение:</label>
-            <input type="file" id="fileInput" accept="image/*">
-            <span class="control-hint">Или вставьте картинку из буфера через Ctrl+V.</span>
+            <label>Изображение</label>
+            <div class="file-upload-wrapper" id="dropZone">
+                <div class="file-upload-text">
+                    Перетащите сюда или <span>выберите файл</span>
+                </div>
+                <input type="file" id="fileInput" accept="image/*">
+            </div>
+            <span class="control-hint">Или вставьте изображение из буфера обмена (Ctrl+V)</span>
         </div>
 
+        <!-- Режим обработки -->
         <div class="control-block">
-            <span>Режим обработки:</span>
-            <label>
-                <input type="radio" name="mode" value="blur" checked>
-                Blur (размытие)
-            </label>
-            <label>
-                <input type="radio" name="mode" value="pixelate">
-                Пикселизация
-            </label>
+            <label>Режим размытия</label>
+            <div class="mode-group">
+                <div class="mode-option">
+                    <input type="radio" name="mode" value="blur" id="modeBlur" checked>
+                    <label for="modeBlur" class="mode-label">Blur</label>
+                </div>
+                <div class="mode-option">
+                    <input type="radio" name="mode" value="pixelate" id="modePixelate">
+                    <label for="modePixelate" class="mode-label">Pixelate</label>
+                </div>
+            </div>
         </div>
 
+        <!-- Интенсивность -->
         <div class="control-block">
-            <label for="intensity">Интенсивность (1-25):</label>
-            <input type="range" id="intensity" min="1" max="25" value="8">
+            <label for="intensity">Интенсивность</label>
+            <div class="range-container">
+                <input type="range" id="intensity" min="1" max="25" value="8">
+                <span class="range-val" id="intensityVal">8</span>
+            </div>
         </div>
 
+        <!-- Панель действий -->
         <div class="control-block control-block-actions">
-            <span>Действия:</span>
+            <label>Действия</label>
             <div class="actions">
-                <button id="applyBtn" disabled>Применить к выделенным областям</button>
-                <button id="undoBtn" disabled>Отменить закрашивание</button>
-                <button id="clearBtn" disabled>Очистить выделения</button>
-                <button id="copyBtn" disabled>Копировать в буфер</button>
-                <button id="downloadBtn" disabled>Скачать результат</button>
+                <button id="applyBtn" class="primary" disabled>Применить к выделениям</button>
+                <button id="undoBtn" disabled>Отменить действие</button>
+                <button id="clearBtn" disabled>Сбросить выделение</button>
+                <button id="copyBtn" disabled>Копировать</button>
+                <button id="downloadBtn" disabled>Скачать</button>
             </div>
         </div>
     </section>
 
-    <div id="canvasWrapper" aria-label="Область редактирования изображения">
-        <canvas id="canvas"></canvas>
+    <!-- Область редактирования -->
+    <div id="canvasWrapper" aria-label="Редактор изображения">
+        <div id="canvasPlaceholder" class="canvas-placeholder">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            <span>Загрузите, вставьте или перетащите картинку для начала работы</span>
+        </div>
+        <canvas id="canvas" style="display: none;"></canvas>
     </div>
 
+    <!-- Индикатор статуса -->
     <p id="status" class="status" aria-live="polite"></p>
 
-    <p class="note">
-        1. Загрузите изображение или вставьте его из буфера обмена.<br>
-        2. ЛКМ потяните по картинке, чтобы выделить область. Можно делать несколько выделений подряд.<br>
-        3. Нажмите «Применить к выделенным областям», чтобы обработать выбранные части изображения.<br>
-        4. «Отменить закрашивание» возвращает предыдущее применённое состояние изображения.<br>
-        5. «Копировать в буфер» копирует текущий результат как PNG, «Скачать результат» сохраняет файл.
-    </p>
+    <!-- Инструкция -->
+    <section class="note">
+        <h3>Быстрое руководство</h3>
+        <ol>
+            <li>Загрузите изображение с диска, перетащите его в область загрузки или вставьте из буфера обмена (<strong>Ctrl+V</strong>).</li>
+            <li>Зажмите левую кнопку мыши и выделите область, которую хотите размыть (можно выделить несколько зон одновременно).</li>
+            <li>Нажмите <strong>«Применить к выделениям»</strong>.</li>
+            <li>Скопируйте результат обратно в буфер (<strong>Ctrl+C</strong>) или скачайте файл в формате PNG.</li>
+        </ol>
+    </section>
 </main>
 
 <script src="./app.js"></script>
