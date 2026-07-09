@@ -110,6 +110,13 @@ h1 {
     background: rgba(59, 130, 246, 0.03);
 }
 
+.file-upload-wrapper.drag-over {
+    border-color: var(--accent);
+    background: rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 15px var(--accent-glow);
+    transform: scale(1.02);
+}
+
 .file-upload-wrapper input[type="file"] {
     position: absolute;
     top: 0;

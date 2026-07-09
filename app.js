@@ -48,11 +48,32 @@ class DrawerApp {
     }
 
     bindEvents() {
-        // File selection & drop events
+        // Prevent default browser behavior for file drops globally
+        window.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            this.elements.dropZone.classList.add('drag-over');
+        });
+
+        window.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            if (e.clientX === 0 && e.clientY === 0) {
+                this.elements.dropZone.classList.remove('drag-over');
+            }
+        });
+
+        window.addEventListener('drop', (e) => {
+            e.preventDefault();
+            this.elements.dropZone.classList.remove('drag-over');
+            const file = e.dataTransfer?.files?.[0];
+            if (file && file.type.startsWith('image/')) {
+                this.loadImageFromFile(file);
+            } else if (file) {
+                this.setStatus('Пожалуйста, перетащите файл изображения.', true);
+            }
+        });
+
+        // File selection
         this.elements.fileInput.addEventListener('change', (e) => this.handleFileChange(e));
-        this.elements.dropZone.addEventListener('dragover', (e) => this.handleDragOver(e));
-        this.elements.dropZone.addEventListener('dragleave', (e) => this.handleDragLeave(e));
-        this.elements.dropZone.addEventListener('drop', (e) => this.handleDrop(e));
 
         // Canvas mouse events
         this.elements.canvas.addEventListener('mousedown', (e) => this.handleMouseDown(e));
@@ -83,28 +104,6 @@ class DrawerApp {
         const file = event.target.files?.[0];
         if (file) {
             this.loadImageFromFile(file);
-        }
-    }
-
-    handleDragOver(event) {
-        event.preventDefault();
-        this.elements.dropZone.classList.add('drag-over');
-    }
-
-    handleDragLeave(event) {
-        event.preventDefault();
-        this.elements.dropZone.classList.remove('drag-over');
-    }
-
-    handleDrop(event) {
-        event.preventDefault();
-        this.elements.dropZone.classList.remove('drag-over');
-        
-        const file = event.dataTransfer?.files?.[0];
-        if (file && file.type.startsWith('image/')) {
-            this.loadImageFromFile(file);
-        } else {
-            this.setStatus('Пожалуйста, перетащите файл изображения.', true);
         }
     }
 
