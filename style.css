@@ -1,120 +1,198 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
-
-:root {
-    --bg-primary: #0b0f19;
-    --bg-secondary: #131b2e;
-    --bg-tertiary: #1e294b;
-    --accent: #3b82f6;
-    --accent-glow: rgba(59, 130, 246, 0.45);
-    --accent-hover: #60a5fa;
-    --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
-    --text-muted: #64748b;
-    --border-color: rgba(255, 255, 255, 0.08);
-    --border-hover: rgba(255, 255, 255, 0.16);
-    --success: #10b981;
-    --error: #ef4444;
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
 body {
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-    font-family: 'Outfit', system-ui, -apple-system, sans-serif;
-    min-height: 100vh;
-    padding: 30px 20px;
+    background-color: #008080; /* Classic Windows 95 Teal Desktop */
+    color: #000000;
+    font-family: "Tahoma", "Arial", sans-serif;
+    font-size: 12px;
+    margin: 0;
+    padding: 20px;
     display: flex;
     justify-content: center;
     align-items: flex-start;
+    min-height: 100vh;
 }
 
 .container {
     width: 100%;
-    max-width: 1100px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: 24px;
-    padding: 32px;
-    box-shadow: var(--shadow-xl);
-    backdrop-filter: blur(10px);
+    max-width: 950px;
+    background-color: #c0c0c0; /* Standard Win95 gray */
+    padding: 3px;
+    border: none;
+    border-radius: 0;
+    /* 3D Raised Window Border */
+    box-shadow: inset 1px 1px 0px #ffffff, 
+                inset -1px -1px 0px #000000, 
+                inset 2px 2px 0px #dfdfdf, 
+                inset -2px -2px 0px #808080;
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 0;
 }
 
-h1 {
-    font-size: 28px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    background: linear-gradient(135deg, #f8fafc 0%, #94a3b8 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 4px;
+/* Windows 95 Title Bar */
+.window-title-bar {
+    background: linear-gradient(90deg, #000080, #1084d0); /* Classic blue titlebar gradient */
+    color: #ffffff;
+    padding: 3px 4px 3px 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    height: 22px;
+    box-sizing: border-box;
 }
 
-.subtitle {
-    font-size: 14px;
-    color: var(--text-secondary);
-    margin-top: -16px;
-    margin-bottom: 8px;
+.window-title-bar-text {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Title bar icon placeholder */
+.window-title-bar-icon {
+    width: 16px;
+    height: 16px;
+    background-color: #c0c0c0;
+    border: 1px solid #808080;
+    box-shadow: inset 1px 1px 0px #fff;
+    display: inline-block;
+}
+
+.window-title-controls {
+    display: flex;
+    gap: 2px;
+}
+
+.window-title-btn {
+    width: 16px;
+    height: 14px;
+    background-color: #c0c0c0;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    font-size: 9px;
+    font-weight: bold;
+    color: #000000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 1px 1px 0px #ffffff, 
+                inset -1px -1px 0px #000000, 
+                inset 2px 2px 0px #dfdfdf, 
+                inset -2px -2px 0px #808080;
+    cursor: default;
+}
+
+.window-title-btn:active {
+    box-shadow: inset 1px 1px 0px #000000, 
+                inset -1px -1px 0px #ffffff, 
+                inset 2px 2px 0px #808080, 
+                inset -2px -2px 0px #dfdfdf;
+    padding-top: 1px;
+    padding-left: 1px;
+}
+
+.window-title-btn-close::before {
+    content: "×";
+    font-size: 13px;
+    line-height: 10px;
+    font-family: Arial, sans-serif;
+}
+
+.window-title-btn-min::before {
+    content: "";
+    width: 6px;
+    height: 2px;
+    background-color: #000000;
+    margin-top: 6px;
+}
+
+.window-title-btn-max::before {
+    content: "";
+    width: 8px;
+    height: 7px;
+    border: 1px solid #000000;
+    border-top-width: 2px;
+}
+
+/* Menu Bar */
+.window-menu-bar {
+    display: flex;
+    gap: 12px;
+    padding: 4px 8px;
+    background-color: #c0c0c0;
+    border-bottom: 1px solid #808080;
+    box-shadow: 0 1px 0 #fff;
+}
+
+.menu-item {
+    cursor: default;
+    color: #000000;
+}
+
+.menu-item span {
+    text-decoration: underline;
+}
+
+/* Window Content Body */
+.window-body {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 /* Controls section styling */
 .controls {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 20px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid var(--border-color);
-    border-radius: 18px;
-    padding: 24px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    background-color: #c0c0c0;
+    border: none;
+    border-radius: 0;
+    padding: 0;
 }
 
+/* GroupBox Border (classic Win95 fieldset border with label) */
 .control-block {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
+    position: relative;
+    border: 2px solid #dfdfdf;
+    border-color: #808080 #ffffff #ffffff #808080;
+    padding: 12px;
+    margin-top: 6px;
 }
 
-.control-block label {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+.control-block label.group-title {
+    position: absolute;
+    top: -8px;
+    left: 8px;
+    background-color: #c0c0c0;
+    padding: 0 4px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #000000;
 }
 
 /* File Upload styling */
 .file-upload-wrapper {
     position: relative;
-    border: 2px dashed var(--border-color);
-    border-radius: 12px;
-    padding: 16px;
+    border: 2px solid #000000;
+    border-color: #808080 #ffffff #ffffff #808080;
+    background-color: #ffffff;
+    padding: 10px;
     text-align: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    background: rgba(255, 255, 255, 0.01);
-}
-
-.file-upload-wrapper:hover {
-    border-color: var(--accent);
-    background: rgba(59, 130, 246, 0.03);
+    cursor: default;
+    box-shadow: inset 1px 1px 0px #000000, 
+                inset -1px -1px 0px #dfdfdf;
 }
 
 .file-upload-wrapper.drag-over {
-    border-color: var(--accent);
-    background: rgba(59, 130, 246, 0.1);
-    box-shadow: 0 0 15px var(--accent-glow);
-    transform: scale(1.02);
+    background-color: #ffffe0; /* Classic Win95 Tooltip Yellow highlight on dragover */
+    border-color: #000080;
 }
 
 .file-upload-wrapper input[type="file"] {
@@ -124,104 +202,102 @@ h1 {
     width: 100%;
     height: 100%;
     opacity: 0;
-    cursor: pointer;
+    cursor: default;
 }
 
 .file-upload-text {
-    font-size: 13px;
-    color: var(--text-secondary);
+    font-size: 12px;
+    color: #000000;
 }
 
 .file-upload-text span {
-    color: var(--accent);
-    font-weight: 500;
+    text-decoration: underline;
+    color: #0000ff;
 }
 
 .control-hint {
     font-size: 11px;
-    color: var(--text-muted);
+    color: #404040;
     margin-top: 4px;
 }
 
 /* Radio buttons mode selection */
 .mode-group {
     display: flex;
-    gap: 12px;
-    background: rgba(0, 0, 0, 0.2);
-    padding: 4px;
-    border-radius: 10px;
-    border: 1px solid var(--border-color);
+    flex-direction: column;
+    gap: 8px;
+    padding: 4px 0;
 }
 
 .mode-option {
-    flex: 1;
+    display: flex;
+    align-items: center;
     position: relative;
 }
 
 .mode-option input[type="radio"] {
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
+    margin-right: 6px;
+    cursor: default;
 }
 
 .mode-label {
-    display: block;
-    text-align: center;
-    padding: 8px 12px;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-secondary);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.mode-option input[type="radio"]:checked + .mode-label {
-    background: var(--accent);
-    color: var(--text-primary);
-    box-shadow: 0 0 12px var(--accent-glow);
-}
-
-.mode-label:hover {
-    color: var(--text-primary);
+    font-size: 12px;
+    color: #000000;
+    cursor: default;
 }
 
 /* Range input styling */
 .range-container {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
+    margin-top: 4px;
 }
 
 input[type="range"] {
     -webkit-appearance: none;
     width: 100%;
-    height: 6px;
-    border-radius: 3px;
-    background: rgba(255, 255, 255, 0.1);
+    height: 20px;
+    background: transparent;
     outline: none;
 }
 
-input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: var(--accent);
-    cursor: pointer;
-    box-shadow: 0 0 8px var(--accent-glow);
-    transition: transform 0.1s ease;
+/* Track */
+input[type="range"]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 4px;
+    background-color: #808080;
+    border-bottom: 1px solid #ffffff;
+    border-right: 1px solid #ffffff;
+    box-shadow: inset 1px 1px 0px #000;
 }
 
-input[type="range"]::-webkit-slider-thumb:hover {
-    transform: scale(1.2);
+/* Thumb */
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 20px;
+    background-color: #c0c0c0;
+    border-radius: 0;
+    box-shadow: inset 1px 1px 0px #ffffff, 
+                inset -1px -1px 0px #000000, 
+                inset 2px 2px 0px #dfdfdf, 
+                inset -2px -2px 0px #808080;
+    cursor: default;
+    margin-top: -8px;
+}
+
+input[type="range"]::-webkit-slider-thumb:active {
+    box-shadow: inset 1px 1px 0px #000000, 
+                inset -1px -1px 0px #ffffff, 
+                inset 2px 2px 0px #808080, 
+                inset -2px -2px 0px #dfdfdf;
 }
 
 .range-val {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-primary);
+    font-size: 12px;
+    font-weight: bold;
+    color: #000000;
     min-width: 20px;
     text-align: right;
 }
@@ -234,76 +310,88 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 6px;
     margin-top: 4px;
 }
 
+/* Standard Win95 Buttons */
 button {
-    padding: 10px 18px;
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 500;
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: "Tahoma", "Arial", sans-serif;
+    font-size: 12px;
+    padding: 4px 14px;
+    background-color: #c0c0c0;
+    color: #000000;
+    border: none;
+    border-radius: 0;
+    cursor: default;
+    box-shadow: inset 1px 1px 0px #ffffff, 
+                inset -1px -1px 0px #000000, 
+                inset 2px 2px 0px #dfdfdf, 
+                inset -2px -2px 0px #808080;
+    outline: 1px dotted #000000;
+    outline-offset: -4px;
     display: inline-flex;
     align-items: center;
     gap: 6px;
 }
 
-button:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: var(--border-hover);
-    transform: translateY(-1px);
+/* Hide outline when not focused/active */
+button:not(:focus) {
+    outline: none;
 }
 
-button:active:not(:disabled) {
-    transform: translateY(0);
+button:hover:not(:disabled) {
+    background-color: #c0c0c0;
+}
+
+button:active:not(:disabled),
+button.primary:active:not(:disabled) {
+    box-shadow: inset 1px 1px 0px #000000, 
+                inset -1px -1px 0px #ffffff, 
+                inset 2px 2px 0px #808080, 
+                inset -2px -2px 0px #dfdfdf;
+    padding: 5px 13px 3px 15px; /* Shift text slightly down-right on click */
 }
 
 button:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
+    color: #808080;
+    text-shadow: 1px 1px 0px #ffffff;
+    box-shadow: inset 1px 1px 0px #ffffff, 
+                inset -1px -1px 0px #000000, 
+                inset 2px 2px 0px #dfdfdf, 
+                inset -2px -2px 0px #808080;
 }
 
 button.primary {
-    background: var(--accent);
-    border-color: transparent;
-}
-
-button.primary:hover:not(:disabled) {
-    background: var(--accent-hover);
-    box-shadow: 0 0 15px var(--accent-glow);
+    font-weight: bold;
+    border: 1px solid #000000; /* Thick focus border */
+    box-shadow: inset 1px 1px 0px #ffffff, 
+                inset -1px -1px 0px #000000, 
+                inset 2px 2px 0px #dfdfdf, 
+                inset -2px -2px 0px #808080;
 }
 
 /* Canvas styling */
 #canvasWrapper {
-    background: #090d16;
-    background-image: 
-        linear-gradient(45deg, #131722 25%, transparent 25%), 
-        linear-gradient(-45deg, #131722 25%, transparent 25%), 
-        linear-gradient(45deg, transparent 75%, #131722 75%), 
-        linear-gradient(-45deg, transparent 75%, #131722 75%);
-    background-size: 20px 20px;
-    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
+    background: #000000;
+    border: 2px solid #000000;
+    border-color: #808080 #ffffff #ffffff #808080;
+    box-shadow: inset 1px 1px 0px #000000, 
+                inset -1px -1px 0px #dfdfdf;
     overflow: auto;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 240px;
-    max-height: 600px;
+    min-height: 260px;
+    max-height: 500px;
     position: relative;
+    padding: 8px;
 }
 
 canvas {
     display: block;
     cursor: crosshair;
-    box-shadow: var(--shadow-lg);
+    box-shadow: none;
     max-width: 100%;
 }
 
@@ -311,60 +399,65 @@ canvas {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
-    color: var(--text-muted);
-    font-size: 14px;
+    gap: 8px;
+    color: #808080;
+    font-size: 12px;
+    text-shadow: 1px 1px 0px #ffffff;
 }
 
 .canvas-placeholder svg {
-    width: 48px;
-    height: 48px;
-    stroke: var(--text-muted);
+    width: 32px;
+    height: 32px;
+    stroke: #808080;
 }
 
-/* Status messaging */
+/* Status messaging (Win95 statusbar pane style) */
 .status {
-    min-height: 24px;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--success);
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    min-height: 20px;
+    font-size: 11px;
+    color: #000000;
+    background-color: #c0c0c0;
+    border: 2px solid #000000;
+    border-color: #808080 #ffffff #ffffff #808080;
+    box-shadow: inset 1px 1px 0px #000000, 
+                inset -1px -1px 0px #dfdfdf;
+    padding: 2px 6px;
+    margin: 4px 0 0 0;
 }
 
 .status.is-error {
-    color: var(--error);
+    color: #ff0000;
 }
 
 /* User Manual note card */
 .note {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    padding: 20px;
-    font-size: 13px;
-    line-height: 1.6;
-    color: var(--text-secondary);
+    background-color: #c0c0c0;
+    border: 2px solid #dfdfdf;
+    border-color: #808080 #ffffff #ffffff #808080;
+    padding: 10px;
+    font-size: 11px;
+    line-height: 1.5;
+    color: #000000;
+    box-shadow: inset 1px 1px 0px #ffffff;
 }
 
 .note h3 {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 8px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #000000;
+    margin: 0 0 6px 0;
 }
 
 .note ol {
-    padding-left: 20px;
+    padding-left: 18px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
 }
 
 @media (max-width: 768px) {
     .container {
-        padding: 20px;
+        padding: 2px;
     }
     
     .controls {

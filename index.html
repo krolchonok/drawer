@@ -9,85 +9,103 @@
 </head>
 <body>
 <main class="container">
-    <header>
-        <h1>Blur & Pixelate Utility</h1>
-        <p class="subtitle">Скрытие конфиденциальной информации на изображениях</p>
-    </header>
-
-    <section class="controls" aria-label="Панель управления">
-        <!-- Загрузка изображения -->
-        <div class="control-block">
-            <label>Изображение</label>
-            <div class="file-upload-wrapper" id="dropZone">
-                <div class="file-upload-text">
-                    Перетащите сюда или <span>выберите файл</span>
-                </div>
-                <input type="file" id="fileInput" accept="image/*">
-            </div>
-            <span class="control-hint">Или вставьте изображение из буфера обмена (Ctrl+V)</span>
+    <!-- Windows 95 Title Bar -->
+    <div class="window-title-bar">
+        <div class="window-title-bar-text">
+            <span class="window-title-bar-icon"></span>
+            Blur & Pixelate Utility
         </div>
-
-        <!-- Режим обработки -->
-        <div class="control-block">
-            <label>Режим размытия</label>
-            <div class="mode-group">
-                <div class="mode-option">
-                    <input type="radio" name="mode" value="blur" id="modeBlur" checked>
-                    <label for="modeBlur" class="mode-label">Blur</label>
-                </div>
-                <div class="mode-option">
-                    <input type="radio" name="mode" value="pixelate" id="modePixelate">
-                    <label for="modePixelate" class="mode-label">Pixelate</label>
-                </div>
-            </div>
+        <div class="window-title-controls">
+            <button class="window-title-btn window-title-btn-min" aria-label="Minimize"></button>
+            <button class="window-title-btn window-title-btn-max" aria-label="Maximize"></button>
+            <button class="window-title-btn window-title-btn-close" aria-label="Close"></button>
         </div>
-
-        <!-- Интенсивность -->
-        <div class="control-block">
-            <label for="intensity">Интенсивность</label>
-            <div class="range-container">
-                <input type="range" id="intensity" min="1" max="25" value="8">
-                <span class="range-val" id="intensityVal">8</span>
-            </div>
-        </div>
-
-        <!-- Панель действий -->
-        <div class="control-block control-block-actions">
-            <label>Действия</label>
-            <div class="actions">
-                <button id="applyBtn" class="primary" disabled>Применить к выделениям</button>
-                <button id="undoBtn" disabled>Отменить действие</button>
-                <button id="clearBtn" disabled>Сбросить выделение</button>
-                <button id="copyBtn" disabled>Копировать</button>
-                <button id="downloadBtn" disabled>Скачать</button>
-            </div>
-        </div>
-    </section>
-
-    <!-- Область редактирования -->
-    <div id="canvasWrapper" aria-label="Редактор изображения">
-        <div id="canvasPlaceholder" class="canvas-placeholder">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-            </svg>
-            <span>Загрузите, вставьте или перетащите картинку для начала работы</span>
-        </div>
-        <canvas id="canvas" style="display: none;"></canvas>
     </div>
 
-    <!-- Индикатор статуса -->
-    <p id="status" class="status" aria-live="polite"></p>
+    <!-- Windows 95 Menu Bar -->
+    <div class="window-menu-bar">
+        <div class="menu-item"><span>Ф</span>айл</div>
+        <div class="menu-item"><span>П</span>равка</div>
+        <div class="menu-item"><span>С</span>правка</div>
+    </div>
 
-    <!-- Инструкция -->
-    <section class="note">
-        <h3>Быстрое руководство</h3>
-        <ol>
-            <li>Загрузите изображение с диска, перетащите его в область загрузки или вставьте из буфера обмена (<strong>Ctrl+V</strong>).</li>
-            <li>Зажмите левую кнопку мыши и выделите область, которую хотите размыть (можно выделить несколько зон одновременно).</li>
-            <li>Нажмите <strong>«Применить к выделениям»</strong>.</li>
-            <li>Скопируйте результат обратно в буфер (<strong>Ctrl+C</strong>) или скачайте файл в формате PNG.</li>
-        </ol>
-    </section>
+    <!-- Windows 95 Window Body -->
+    <div class="window-body">
+        <section class="controls" aria-label="Панель управления">
+            <!-- Загрузка изображения -->
+            <div class="control-block">
+                <label class="group-title">Изображение</label>
+                <div class="file-upload-wrapper" id="dropZone">
+                    <div class="file-upload-text">
+                        Перетащите сюда или <span>выберите файл</span>
+                    </div>
+                    <input type="file" id="fileInput" accept="image/*">
+                </div>
+                <span class="control-hint">Или вставьте из буфера (Ctrl+V)</span>
+            </div>
+
+            <!-- Режим обработки -->
+            <div class="control-block">
+                <label class="group-title">Режим обработки</label>
+                <div class="mode-group">
+                    <div class="mode-option">
+                        <input type="radio" name="mode" value="blur" id="modeBlur" checked>
+                        <label for="modeBlur" class="mode-label">Размытие (Blur)</label>
+                    </div>
+                    <div class="mode-option">
+                        <input type="radio" name="mode" value="pixelate" id="modePixelate">
+                        <label for="modePixelate" class="mode-label">Пикселизация</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Интенсивность -->
+            <div class="control-block">
+                <label class="group-title" for="intensity">Интенсивность</label>
+                <div class="range-container">
+                    <input type="range" id="intensity" min="1" max="25" value="8">
+                    <span class="range-val" id="intensityVal">8</span>
+                </div>
+            </div>
+
+            <!-- Панель действий -->
+            <div class="control-block control-block-actions">
+                <label class="group-title">Действия</label>
+                <div class="actions">
+                    <button id="applyBtn" class="primary" disabled>Применить эффект</button>
+                    <button id="undoBtn" disabled>Отменить (Ctrl+Z)</button>
+                    <button id="clearBtn" disabled>Очистить выбор</button>
+                    <button id="copyBtn" disabled>Копировать (Ctrl+C)</button>
+                    <button id="downloadBtn" disabled>Сохранить</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Область редактирования -->
+        <div id="canvasWrapper" aria-label="Редактор изображения">
+            <div id="canvasPlaceholder" class="canvas-placeholder">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <span>Загрузите или перетащите файл изображения</span>
+            </div>
+            <canvas id="canvas" style="display: none;"></canvas>
+        </div>
+
+        <!-- Индикатор статуса (Строка состояния) -->
+        <p id="status" class="status" aria-live="polite">Готово</p>
+
+        <!-- Инструкция -->
+        <section class="note">
+            <h3>Краткая справка</h3>
+            <ol>
+                <li>Вставьте картинку через Ctrl+V, перетащите файл или воспользуйтесь кнопкой выбора.</li>
+                <li>Зажмите левую кнопку мыши и выделите прямоугольник на изображении.</li>
+                <li>Нажмите «Применить эффект».</li>
+                <li>Сохраните результат через копирование или скачивание.</li>
+            </ol>
+        </section>
+    </div>
 </main>
 
 <script src="./app.js"></script>
