@@ -172,8 +172,8 @@ class DrawerApp {
     // --- Key Actions ---
 
     handleKeyDown(event) {
-        const isUndoShortcut = (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z';
-        const isCopyShortcut = (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'c';
+        const isUndoShortcut = (event.ctrlKey || event.metaKey) && (event.code === 'KeyZ' || event.key.toLowerCase() === 'z');
+        const isCopyShortcut = (event.ctrlKey || event.metaKey) && (event.code === 'KeyC' || event.key.toLowerCase() === 'c');
         const target = event.target;
         const isEditableTarget = target instanceof HTMLElement
             && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName));
