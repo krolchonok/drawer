@@ -763,6 +763,12 @@ class DrawerApp {
             return;
         }
 
+        if (!this.isFirefox()) {
+            // Chromium's execCommand('copy') fallback reports success without
+            // actually placing image bytes on the clipboard, so don't trust it.
+            throw new Error('Async Clipboard API for images is unavailable in this context.');
+        }
+
         const dataUrl = await this.blobToDataUrl(blob);
         const copied = this.copyImageWithExecCommand(dataUrl);
 
@@ -829,15 +835,19 @@ class DrawerApp {
     }
 
     getClipboardErrorMessage() {
-        if (navigator.userAgent.includes('Firefox')) {
+        if (this.isFirefox()) {
             return 'Firefox ограничивает запись изображений в буфер обмена для веб-страниц. Если копирование не сработало, используйте скачивание.';
         }
 
         if (!window.isSecureContext) {
-            return 'Буфер обмена для изображений работает только в secure context: HTTPS или localhost.';
+            return 'Буфер обмена для изображений работает только в secure context: HTTPS или localhost. Откройте страницу по HTTPS (или через localhost), либо используйте «Скачать результат».';
         }
 
         return 'Не удалось записать изображение в буфер обмена.';
+    }
+
+    isFirefox() {
+        return navigator.userAgent.includes('Firefox');
     }
 }
 
