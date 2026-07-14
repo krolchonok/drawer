@@ -114,14 +114,20 @@ class DrawerApp {
 
     handlePaste(event) {
         const items = Array.from(event.clipboardData?.items || []);
+        console.log('[paste] event fired, target=', event.target, 'items=', items.map((item) => ({ kind: item.kind, type: item.type })));
+
         const imageItem = items.find((item) => item.type.startsWith('image/'));
 
         if (!imageItem) {
+            console.log('[paste] no image/* item found in clipboardData, ignoring paste');
             return;
         }
 
         const file = imageItem.getAsFile();
+        console.log('[paste] imageItem=', imageItem.type, 'file=', file && { name: file.name, size: file.size, type: file.type });
+
         if (!file) {
+            console.warn('[paste] getAsFile() returned null');
             this.setStatus('Не удалось прочитать изображение из буфера обмена.', true);
             return;
         }
@@ -131,20 +137,26 @@ class DrawerApp {
     }
 
     loadImageFromFile(file, successMessage = 'Изображение загружено.') {
+        console.log('[loadImageFromFile] start, file=', { name: file.name, size: file.size, type: file.type });
         const reader = new FileReader();
         reader.onload = (loadEvent) => {
+            const result = loadEvent.target?.result;
+            console.log('[loadImageFromFile] FileReader onload, result length=', result?.length);
             const image = new Image();
             image.onload = () => {
+                console.log('[loadImageFromFile] Image onload, dimensions=', image.width, 'x', image.height);
                 this.initializeCanvasFromImage(image);
                 this.elements.fileInput.value = '';
                 this.setStatus(successMessage);
             };
-            image.onerror = () => {
+            image.onerror = (err) => {
+                console.error('[loadImageFromFile] Image onerror', err);
                 this.setStatus('Не удалось открыть изображение.', true);
             };
-            image.src = loadEvent.target?.result;
+            image.src = result;
         };
-        reader.onerror = () => {
+        reader.onerror = (err) => {
+            console.error('[loadImageFromFile] FileReader onerror', err);
             this.setStatus('Не удалось прочитать файл.', true);
         };
         reader.readAsDataURL(file);
@@ -153,6 +165,7 @@ class DrawerApp {
     initializeCanvasFromImage(image) {
         const width = image.width;
         const height = image.height;
+        console.log('[initializeCanvasFromImage] setting canvas to', width, 'x', height);
 
         this.elements.canvas.width = width;
         this.elements.canvas.height = height;
@@ -172,6 +185,7 @@ class DrawerApp {
         this.elements.canvasPlaceholder.style.display = 'none';
 
         this.render();
+        console.log('[initializeCanvasFromImage] done, canvas rect=', this.elements.canvas.getBoundingClientRect());
     }
 
     // --- Key Actions ---
